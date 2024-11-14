@@ -7,6 +7,7 @@
 #include "ast.hpp"
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace matheval {
@@ -56,6 +57,27 @@ struct eval {
 
 private:
     std::map<std::string, double> st;
+};
+
+struct variables_finder {
+    using result_type = std::set<std::string>;
+
+    result_type operator()(nil) const;
+
+    result_type operator()(double n) const;
+
+    result_type operator()(std::string const &c) const;
+
+    result_type operator()(operation const &x, result_type lhs) const;
+
+    result_type operator()(unary_op const &x) const;
+
+    result_type operator()(binary_op const &x) const;
+
+    result_type operator()(ternary_op const &x) const;
+
+    result_type operator()(expression const &x) const;
+
 };
 
 } // namespace ast

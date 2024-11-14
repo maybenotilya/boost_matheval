@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <memory>
 #include <string>
 
@@ -45,6 +46,8 @@ public:
     ///
     /// @param[in] st The symbol table
     double evaluate(std::map<std::string, double> const &st = {});
+
+    std::set<std::string> find_variables();
 };
 
 /// @brief Convenience function

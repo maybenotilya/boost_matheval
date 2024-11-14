@@ -37,6 +37,10 @@ public:
     double evaluate(std::map<std::string, double> const &st) {
         return boost::apply_visitor(ast::eval{st}, ast);
     }
+
+    std::set<std::string> find_variables() {
+        return boost::apply_visitor(ast::variables_finder{}, ast);
+    }
 };
 
 Parser::Parser() : pimpl{std::make_unique<Parser::impl>()} {}
@@ -49,6 +53,10 @@ void Parser::optimize() { pimpl->optimize(); }
 
 double Parser::evaluate(std::map<std::string, double> const &st) {
     return pimpl->evaluate(st);
+}
+
+std::set<std::string> Parser::find_variables() {
+    return pimpl->find_variables();
 }
 
 } // namespace matheval

@@ -8,16 +8,6 @@ find_package(Boost COMPONENTS unit_test_framework)
 function(UNIT_TEST)
   # Parse arguments
   cmake_parse_arguments(UT "" "TARGET" "SOURCE" ${ARGN} )
-  # Add target for QI
-  add_executable(matheval.qi.${UT_TARGET} ${UT_SOURCE})
-  target_include_directories(matheval.qi.${UT_TARGET} PRIVATE ${Boost_INCLUDE_DIRS})
-  target_link_libraries(matheval.qi.${UT_TARGET} PRIVATE matheval::qi)
-  set_target_properties(matheval.qi.${UT_TARGET} PROPERTIES
-      CXX_CLANG_TIDY ""
-      CXX_STANDARD 98)
-  if(MSVC)
-    set_property(SOURCE ${UT_SOURCE} PROPERTY COMPILE_FLAGS "/DNOMINMAX")
-  endif()
   # Add target for X3
   add_executable(matheval.x3.${UT_TARGET} ${UT_SOURCE})
   target_include_directories(matheval.x3.${UT_TARGET} PRIVATE ${Boost_INCLUDE_DIRS})
@@ -29,9 +19,8 @@ function(UNIT_TEST)
     set_property(SOURCE ${UT_SOURCE} PROPERTY COMPILE_FLAGS "/DNOMINMAX")
   endif()
   # Tests are executed in the root directory
-  add_test(NAME matheval.qi.${UT_TARGET} COMMAND matheval.qi.${UT_TARGET})
   add_test(NAME matheval.x3.${UT_TARGET} COMMAND matheval.x3.${UT_TARGET})
-  add_dependencies(check matheval.qi.${UT_TARGET} matheval.x3.${UT_TARGET})
+  add_dependencies(check matheval.x3.${UT_TARGET})
 endfunction(UNIT_TEST)
 
 # Add the tests
@@ -46,4 +35,5 @@ if(Boost_FOUND)
   unit_test(TARGET errors SOURCE errors.cpp)
   #unit_test(TARGET empty_node SOURCE empty_node.cpp)
   unit_test(TARGET interface SOURCE interface.cpp)
+  unit_test(TARGET variables_finder SOURCE variables_finder.cpp)
 endif()

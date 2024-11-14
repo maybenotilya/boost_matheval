@@ -145,6 +145,53 @@ double eval::operator()(expression const &x) const {
     return state;
 }
 
+// Variables finder
+
+std::set<std::string> variables_finder::operator()(nil) const {
+    BOOST_ASSERT(0);
+    return {};
+}
+
+std::set<std::string> variables_finder::operator()(double n) const { return {}; }
+
+std::set<std::string> variables_finder::operator()(std::string const &c) const {
+    return {c};
+}
+
+std::set<std::string> variables_finder::operator()(operation const &x, std::set<std::string> lhs) const {
+    auto vars = boost::apply_visitor(*this, x.rhs);
+    vars.insert(lhs.begin(), lhs.end());
+    return vars;
+}
+
+std::set<std::string> variables_finder::operator()(unary_op const &x) const {
+    return boost::apply_visitor(*this, x.rhs);
+}
+
+std::set<std::string> variables_finder::operator()(binary_op const &x) const {
+    auto lhs = boost::apply_visitor(*this, x.lhs);
+    auto rhs = boost::apply_visitor(*this, x.rhs);
+    lhs.insert(rhs.begin(), rhs.end());
+    return lhs;
+}
+
+std::set<std::string> variables_finder::operator()(ternary_op const &x) const {
+    auto cond = boost::apply_visitor(*this, x.cond);
+    auto t = boost::apply_visitor(*this, x.t);
+    auto f = boost::apply_visitor(*this, x.f);
+    cond.insert(t.begin(), t.end());
+    cond.insert(f.begin(), f.end());
+    return cond;
+}
+
+std::set<std::string> variables_finder::operator()(expression const &x) const {
+    auto state = boost::apply_visitor(*this, x.lhs);
+    for (operation const &oper : x.rhs) {
+        state = (*this)(oper, state);
+    }
+    return state;
+}
+
 } // namespace ast
 
 } // namespace matheval
